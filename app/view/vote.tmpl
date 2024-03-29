@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>投票项目</title>
+</head>
+<body>
+    <main>
+        <h2>title:{{.vote.Vote.Title}}</h2>
+        <h2>id:{{.vote.Vote.Id}}</h2> 
+        <h2>userid:{{.vote.Vote.UserId}}</h2>
+        <h2>type:{{.vote.Vote.Type}}</h2> 
+        <h2>status:{{.vote.Vote.Status}}</h2> 
+        
+        <form action="/vote" method="post">
+            <input type="text" name="vote_id" value="{{.vote.Vote.Id}}">  <!--投票项目-->
+          
+            {{range $key, $value := .vote.Opt}}
+                <input type="checkbox" name="opt[]" id="customCheck{{$key}}" value="{{$value.Id}}">  <!--候选框--> <!--value是要提交的值-->
+                <label for="customCheck{{$key}}">{{$value.Name}}</label>  <!--显示选项内容，for用来关联input，点label相当于选择了对应的input框-->
+            {{end}}
+
+            <button type="submit">submit</button>  <!--提交按钮-->
+            
+        </form>
+        
+    </main>
+</body>
+</html>

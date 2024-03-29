@@ -1,1 +1,15 @@
-<h1>首页</h1>
+<!doctype html>
+<html lang="en">
+<head>
+    <title>投票项目</title>
+</head>
+<body>
+    <main>
+        <!--循环遍历.vote中的元素-->
+        {{range .vote}} <!--key是索引，value是值-->
+        <!--a标签是点击跳转-->
+        <h2><a href="/vote?id={{.Id}}">{{.Title}}</a></h2> <!--.代表当前正在迭代的元素-->
+        {{end}} <!--结束循环-->
+    </main>
+</body>
+</html>
