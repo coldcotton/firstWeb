@@ -8,7 +8,7 @@ import (
 )
 
 // 创建一个新的cookie存储会话实例，参数是密钥secretKey
-var store = sessions.NewCookieStore([]byte("secretKey!!!!"))
+var store = sessions.NewCookieStore([]byte("secretKey!!!!")) // 使用cookie存储session，后端不存储session
 var sessionName = "session-name"
 
 // 获取

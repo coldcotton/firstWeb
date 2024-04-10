@@ -18,7 +18,7 @@ type VoteOpt struct {
 	Id          int64     `gorm:"column:id;primary_key;AUTO_INCREMENT;NOT NULL"`
 	Name        string    `gorm:"column:name;default:NULL;comment:'选项名'"`
 	VoteId      int64     `gorm:"column:vote_id;default:NULL;comment:'属于哪个投票项目'"`
-	Count       int32     `gorm:"column:count;default:NULL;comment:'票数'"`
+	Count       int64     `gorm:"column:count;default:NULL;comment:'票数'"`
 	CreatedTime time.Time `gorm:"column:created_time;default:NULL"`
 	UpdatedTime time.Time `gorm:"column:updated_time;default:NULL"`
 }
@@ -48,6 +48,11 @@ type User struct {
 	Password    string    `gorm:"column:password;default:NULL"`
 	CreatedTime time.Time `gorm:"column:created_time;default:NULL"`
 	UpdatedTime time.Time `gorm:"column:updated_time;default:NULL"`
+	Uuid        string    `gorm:"column:uuid;default:NULL"`
+}
+
+func (v *User) TableName() string {
+	return "user"
 }
 
 type VoteWithOpt struct {

@@ -104,3 +104,102 @@ func DoVoteV2(userId, voteId int64, optIDs []int64) bool {
 
 	return true
 }
+
+// CURD：create、update、read、delete
+
+// 创建投票项目
+func AddVote(vote Vote, opt []VoteOpt) error {
+	err := Conn.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&vote).Error; err != nil {
+			return err
+		}
+		for _, voteOpt := range opt {
+			voteOpt.VoteId = vote.Id
+			if err := tx.Create(&voteOpt).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+func UpdateVote(vote Vote, opt []VoteOpt) error {
+	err := Conn.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(&vote).Error; err != nil {
+			return err
+		}
+		for _, voteOpt := range opt {
+			if err := tx.Save(&voteOpt).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+// 删除一个投票项目
+func DelVote(id int64) bool {
+	if err := Conn.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Delete(&Vote{}, id).Error; err != nil {
+			fmt.Printf("err:%s", err.Error())
+			return err
+		}
+
+		if err := tx.Where("vote_id = ?", id).Delete(&VoteOpt{}).Error; err != nil {
+			fmt.Printf("err:%s", err.Error())
+			return err
+		}
+
+		if err := tx.Where("vote_id = ?", id).Delete(&VoteOptUser{}).Error; err != nil {
+			fmt.Printf("err:%s", err.Error())
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		fmt.Printf("err:%s", err.Error())
+		return false
+	}
+
+	return true
+}
+
+// 投票历史
+func GetVoteHistory(userId, voteId int64) []VoteOptUser {
+	ret := make([]VoteOptUser, 0)
+	if err := Conn.Table("vote_opt_user").Where("vote_id=? and user_id=?", voteId, userId).First(&ret).Error; err != nil {
+		fmt.Printf("err:%s", err.Error())
+	}
+	return ret
+}
+
+func EndVote() {
+	votes := make([]Vote, 0)
+	if err := Conn.Table("vote").Where("status=?", 1).Find(&votes).Error; err != nil {
+		return
+	}
+
+	now := time.Now().Unix()
+	for _, vote := range votes {
+		if vote.Time+vote.CreatedTime.Unix() <= now {
+			Conn.Table("vote").Where("id=?", vote.Id).Update("status", 0)
+		}
+	}
+}
+
+// 原生sql
+func EndVoteV1() {
+	votes := make([]Vote, 0)
+	if err := Conn.Raw("select * from vote where status = ?", 1).Scan(&votes).Error; err != nil {
+		return
+	}
+
+	now := time.Now().Unix()
+	for _, vote := range votes {
+		if vote.Time+vote.CreatedTime.Unix() <= now {
+			Conn.Exec("update vote set status = 0 where id = ? limit 1", vote.Id)
+		}
+	}
+}

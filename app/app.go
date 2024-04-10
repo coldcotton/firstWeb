@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/coldcotton/firstWeb/app/model"
 	"github.com/coldcotton/firstWeb/app/router"
+	"github.com/coldcotton/firstWeb/app/tools"
 )
 
 // 启动器方法
@@ -12,5 +13,9 @@ func Start() {
 		model.Close()
 	}()
 
-	router.NewRouter()
+	// schedule.Start() // 启动定时器
+
+	tools.NewLogger() // 日志
+
+	router.NewRouter() // 启动路由
 }
